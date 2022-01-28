@@ -1,6 +1,7 @@
 from .numtor import Numtor
 import numpy as np
 
+
 def np_exp(arg: Numtor):
     return Numtor(np.exp(arg.value), op='exp', parents=[arg])
 

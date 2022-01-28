@@ -2,6 +2,7 @@ from .numtor import Numtor
 from .ops import *
 import pytest
 
+
 def test_exp():
     x = Numtor(3)
     a = Numtor(8)
@@ -20,7 +21,6 @@ def test_complex_log():
     c.backward()
     assert x.grad == pytest.approx((3*x.value*x.value+b.value) / (x.value**3 + b.value * x.value + a.value*y.value**2))
     assert y.grad == pytest.approx((2*a.value*y.value)/ (x.value**3 + b.value * x.value + a.value*y.value**2))
-
 
 def test_sigmoid():
     x1 = Numtor(1)

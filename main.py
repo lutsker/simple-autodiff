@@ -1,6 +1,7 @@
 import autodiff as ad
 import numpy as np
 
+
 if __name__ == '__main__':
     x = ad.Numtor(1)
     a = ad.Numtor(3)
