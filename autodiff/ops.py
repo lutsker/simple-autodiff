@@ -1,4 +1,4 @@
-from numtor import Numtor
+from .numtor import Numtor
 import numpy as np
 
 def np_exp(arg: Numtor):

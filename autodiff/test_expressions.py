@@ -1,5 +1,5 @@
-from numtor import Numtor
-from ops import *
+from .numtor import Numtor
+from .ops import *
 import pytest
 
 def test_exp():

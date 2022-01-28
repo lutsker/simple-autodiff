@@ -1,4 +1,4 @@
-from grad_ops import grad_ops
+from .grad_ops import grad_ops
 
 class Numtor:
     def __init__(self, value, op='assign', parents=None):
