@@ -71,10 +71,10 @@ def test_square_loss():
     assert a.grad == pytest.approx(2*a.value * x.value * x.value )
     assert x.grad == pytest.approx(2*x.value * a.value**2)
 
-    x1 = Numtor(1, name='x1')
-    x2 = Numtor(1, name='x2')
-    b = Numtor(1, name='b')
-    a = Numtor(1, name='a')
+    x1 = Numtor(-3, name='x1')
+    x2 = Numtor(2, name='x2')
+    b = Numtor(-1, name='b')
+    a = Numtor(5, name='a')
     y1 = x1 * b 
     z1 = x2 + y1
     w1 = a - z1
@@ -82,4 +82,4 @@ def test_square_loss():
     l.backward_fixed()
     print(x1.grad, y1.grad)
     assert x1.grad == pytest.approx(2*(a.value - x2.value - x1.value * b.value) * (-b.value) )
-    assert x2.grad == pytest.approx(2*(a.value - x2.value + x1.value * b.value) )
+    assert x2.grad == pytest.approx(-2*(a.value - x2.value - x1.value * b.value) )
