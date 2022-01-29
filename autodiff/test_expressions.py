@@ -8,7 +8,7 @@ def test_exp():
     x = Numtor(3)
     a = Numtor(8)
     y = np_exp(a*x)
-    y.backward()
+    y.backward_fixed()
     assert x.grad == y.value * a.value
 
 def test_complex_log():
@@ -19,7 +19,7 @@ def test_complex_log():
 
     c = np_log(x*x*x + b*x + a*y*y)
     assert c.value == pytest.approx(np.log(x.value**3+b.value*x.value+a.value*y.value**2))
-    c.backward()
+    c.backward_fixed()
     assert x.grad == pytest.approx((3*x.value*x.value+b.value) / (x.value**3 + b.value * x.value + a.value*y.value**2))
     assert y.grad == pytest.approx((2*a.value*y.value)/ (x.value**3 + b.value * x.value + a.value*y.value**2))
 
@@ -36,7 +36,7 @@ def test_sigmoid():
     z2 = w21 * x1 + w22 * x2
 
     y = np_sigmoid(z1) + np_sigmoid(z2)
-    y.backward()
+    y.backward_fixed()
 
     zz1 = w11.value * x1.value + w12.value * x2.value
     zz2 = w21.value * x1.value + w22.value * x2.value
@@ -50,7 +50,7 @@ def test_sub():
     a = Numtor(2)
     b = Numtor(5)
     x = a - b
-    x.backward() 
+    x.backward_fixed() 
     assert a.grad == pytest.approx(1)
     assert b.grad == pytest.approx(-1)
 
@@ -64,20 +64,22 @@ def test_sub_complex():
     assert b.grad == pytest.approx(-z.value)
 
 def test_square_loss():
-    # a = Numtor(0.1)
-    # x = Numtor(2)
-    # z = a*x*a*x
-    # z.backward()
-    # assert a.grad == pytest.approx(2*a.value * x.value * x.value )
-    # assert x.grad == pytest.approx(2*x.value * a.value**2)
+    a = Numtor(0.1)
+    x = Numtor(2)
+    z = a*x*a*x
+    z.backward_fixed()
+    assert a.grad == pytest.approx(2*a.value * x.value * x.value )
+    assert x.grad == pytest.approx(2*x.value * a.value**2)
 
-    x1 = Numtor(2, name='x1')
-    x2 = Numtor(-1, name='x2')
-    b = Numtor(5, name='b')
-    y1 = x1  + b
-#    y2 = x1  + b
-    l = (x2 - y1) * (x2 - y1) # x2^2 + 2(x1+b)x2 + (x1+b)^2 = x2^2 + 2x1x2 + (x1+b)^2 -> 
-    l.backward()
+    x1 = Numtor(1, name='x1')
+    x2 = Numtor(1, name='x2')
+    b = Numtor(1, name='b')
+    a = Numtor(1, name='a')
+    y1 = x1 * b 
+    z1 = x2 + y1
+    w1 = a - z1
+    l = w1 * w1  
+    l.backward_fixed()
     print(x1.grad, y1.grad)
-    assert x1.grad == pytest.approx(-2*(x2.value - x1.value - b.value) )
-    assert x2.grad == pytest.approx( 2*(x2.value - x1.value - b.value) )
+    assert x1.grad == pytest.approx(2*(a.value - x2.value - x1.value * b.value) * (-b.value) )
+    assert x2.grad == pytest.approx(2*(a.value - x2.value + x1.value * b.value) )
