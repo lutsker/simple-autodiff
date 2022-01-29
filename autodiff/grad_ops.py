@@ -18,7 +18,17 @@ def sigmoid_grad(self, parents):
     for parent in parents:
         parent.backward(np_sigmoid_grad(parent, self))
 
-grad_ops = {'exp': exp_grad, 'log': log_grad, 'add': add_grad, 'mul': mul_grad, 'sigmoid': sigmoid_grad}
+def sub_grad(self, parents):
+    parents[0].backward(self.grad)
+    parents[1].backward(-self.grad)
+
+def assign_grad(self, parents):
+  #  print("assign_grad:", parents)
+  pass
+
+grad_ops = {'exp': exp_grad, 'log': log_grad, 'add': add_grad, 'mul': mul_grad, 'sigmoid': sigmoid_grad,
+'sub': sub_grad, 'assign': assign_grad}
+
 
 def np_sigmoid_grad(parent, this):
     return this.value * (1-this.value) * this.grad

@@ -1,3 +1,4 @@
+from ast import Num
 from .numtor import Numtor
 from .ops import *
 import pytest
@@ -44,3 +45,39 @@ def test_sigmoid():
 
     assert x2.grad == pytest.approx(ss1 * (1-ss1) * w12.value + ss2 * (1-ss2) * w22.value)
     assert x1.grad == pytest.approx(ss1 * (1-ss1) * w11.value + ss2 * (1-ss2) * w21.value)
+
+def test_sub():
+    a = Numtor(2)
+    b = Numtor(5)
+    x = a - b
+    x.backward() 
+    assert a.grad == pytest.approx(1)
+    assert b.grad == pytest.approx(-1)
+
+def test_sub_complex():
+    a = Numtor(3)
+    b = Numtor(-4)
+    x = Numtor(9)
+    z = np_exp(a*x - b)
+    z.backward()
+    assert a.grad == pytest.approx(z.value * x.value)
+    assert b.grad == pytest.approx(-z.value)
+
+def test_square_loss():
+    # a = Numtor(0.1)
+    # x = Numtor(2)
+    # z = a*x*a*x
+    # z.backward()
+    # assert a.grad == pytest.approx(2*a.value * x.value * x.value )
+    # assert x.grad == pytest.approx(2*x.value * a.value**2)
+
+    x1 = Numtor(2, name='x1')
+    x2 = Numtor(-1, name='x2')
+    b = Numtor(5, name='b')
+    y1 = x1  + b
+#    y2 = x1  + b
+    l = (x2 - y1) * (x2 - y1) # x2^2 + 2(x1+b)x2 + (x1+b)^2 = x2^2 + 2x1x2 + (x1+b)^2 -> 
+    l.backward()
+    print(x1.grad, y1.grad)
+    assert x1.grad == pytest.approx(-2*(x2.value - x1.value - b.value) )
+    assert x2.grad == pytest.approx( 2*(x2.value - x1.value - b.value) )
