@@ -1,4 +1,3 @@
-from ast import Num
 from .numtor import Numtor
 from .ops import *
 import pytest
@@ -8,7 +7,7 @@ def test_exp():
     x = Numtor(3)
     a = Numtor(8)
     y = np_exp(a*x)
-    y.backward_fixed()
+    y.backward()
     assert x.grad == y.value * a.value
 
 def test_complex_log():
@@ -19,7 +18,7 @@ def test_complex_log():
 
     c = np_log(x*x*x + b*x + a*y*y)
     assert c.value == pytest.approx(np.log(x.value**3+b.value*x.value+a.value*y.value**2))
-    c.backward_fixed()
+    c.backward()
     assert x.grad == pytest.approx((3*x.value*x.value+b.value) / (x.value**3 + b.value * x.value + a.value*y.value**2))
     assert y.grad == pytest.approx((2*a.value*y.value)/ (x.value**3 + b.value * x.value + a.value*y.value**2))
 
@@ -36,7 +35,7 @@ def test_sigmoid():
     z2 = w21 * x1 + w22 * x2
 
     y = np_sigmoid(z1) + np_sigmoid(z2)
-    y.backward_fixed()
+    y.backward()
 
     zz1 = w11.value * x1.value + w12.value * x2.value
     zz2 = w21.value * x1.value + w22.value * x2.value
@@ -50,7 +49,7 @@ def test_sub():
     a = Numtor(2)
     b = Numtor(5)
     x = a - b
-    x.backward_fixed() 
+    x.backward() 
     assert a.grad == pytest.approx(1)
     assert b.grad == pytest.approx(-1)
 
@@ -67,7 +66,7 @@ def test_square_loss():
     a = Numtor(0.1)
     x = Numtor(2)
     z = a*x*a*x
-    z.backward_fixed()
+    z.backward()
     assert a.grad == pytest.approx(2*a.value * x.value * x.value )
     assert x.grad == pytest.approx(2*x.value * a.value**2)
 
@@ -79,7 +78,7 @@ def test_square_loss():
     z1 = x2 + y1
     w1 = a - z1
     l = w1 * w1  
-    l.backward_fixed()
+    l.backward()
     print(x1.grad, y1.grad)
     assert x1.grad == pytest.approx(2*(a.value - x2.value - x1.value * b.value) * (-b.value) )
     assert x2.grad == pytest.approx(-2*(a.value - x2.value - x1.value * b.value) )
@@ -90,7 +89,31 @@ def test_square():
     c = Numtor(2, name='c')
     y = x * c
     b = (a+y)*(a+y)
-    b.backward_fixed()
+    b.backward()
     print(x.grad, 2 * 5 * 2)
     assert x.grad == 20
     assert c.grad == 20
+
+def test_chained():
+    x1 = Numtor(1)
+    x2 = Numtor(2)
+    w1 = Numtor(1)
+    w2 = Numtor(-1)
+    w3 = Numtor(2)
+    z = np_sigmoid( x1 * w1 + x2 * w2 )
+    y = w3 * z
+    y.backward()
+    # dy/dw2 = w3 z(1-z)x1
+    assert w3.grad == z.value
+    assert w1.grad == w3.value * z.value * (1-z.value) * x1.value
+    assert w2.grad == w3.value * z.value * (1-z.value) * x2.value
+
+def test_chained_shared_weight():
+    x1 = Numtor(1)
+    x2 = Numtor(2)
+    w  = Numtor(2)
+    z = np_sigmoid( x1 * w + x2 * w )
+    y = w * z
+    y.backward()
+    # dy/dw = z + w z(1-z)(x1 + x2)
+    assert w.grad == z.value + w.value * z.value * (1-z.value) * (x1.value + x2.value)

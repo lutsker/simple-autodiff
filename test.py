@@ -20,6 +20,7 @@ y.backward()
 print(a.grad)
 
 
+
 # a.node = register(ConstNode())
 # b.node = register(VarNode())
 
