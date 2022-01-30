@@ -9,21 +9,25 @@ if __name__ == '__main__':
     alpha = -1.45
     beta = 2.2
     xx = np.arange(N) / float(N) * D
-    yy = alpha * xx + beta + np.random.normal(loc=0, scale=0.25, size=N)
+    yy = alpha * xx + beta + np.random.normal(loc=0, scale=0.5, size=N)
 
     # Model
-    eta = 0.00002
-    epochs = 1800
+    eta = 0.00003
+    epochs = 500
     a = ad.Numtor(0.1)
     b = ad.Numtor(0.2)
-    for _ in range(epochs):
+    for ii in range(epochs):
         for sample_index in np.arange(N):
             x = ad.Numtor(xx[sample_index])
             y = ad.Numtor(yy[sample_index])
-            yp1 = a*x + b
-            w = yp1 - y
-            loss = w * w
-            loss.backward_fixed()
+            z1 = a*x 
+            z2 = a*x
+            yp1 = z1 + b
+            yp2 = z2 + b
+            w1 = yp1 - y
+            w2 = yp2 - y
+            loss = w1 * w2
+            loss.backward()
             a = ad.Numtor(a.value - eta * a.grad)
-            b = ad.Numtor(b.value - eta * b.grad) 
+            b = ad.Numtor(b.value - eta * b.grad)
     print(loss.value, a.value, b.value)
