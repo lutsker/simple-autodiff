@@ -63,7 +63,6 @@ def test_sub_complex():
     assert a.grad == pytest.approx(z.value * x.value)
     assert b.grad == pytest.approx(-z.value)
 
-@pytest.mark.skip(reason='Currently we are mixing ops and results of ops. The introduction of op nodes as tracing means shall make this test work')
 def test_square_loss():
     a = Numtor(0.1)
     x = Numtor(2)
@@ -85,14 +84,13 @@ def test_square_loss():
     assert x1.grad == pytest.approx(2*(a.value - x2.value - x1.value * b.value) * (-b.value) )
     assert x2.grad == pytest.approx(-2*(a.value - x2.value - x1.value * b.value) )
 
-@pytest.mark.skip(reason='See test_square_loss')
-def test_foo():
+def test_square():
     a = Numtor(1, name='a')
     x = Numtor(2, name='x')
     c = Numtor(2, name='c')
     y = x * c
-#    z = (a+y)
     b = (a+y)*(a+y)
     b.backward_fixed()
     print(x.grad, 2 * 5 * 2)
-    assert False
+    assert x.grad == 20
+    assert c.grad == 20

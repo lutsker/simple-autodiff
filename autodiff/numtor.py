@@ -11,13 +11,13 @@ class Numtor:
         self.grad = 0
         self.name = name
 
-        # args = ''
-        # if self.parents:
-        #     for pp in self.parents:
-        #         args += str(pp.value) + ' '
-        # else:
-        #     args = str(value)
- #       print('Numtor:', self.name, value, op, args, self.__repr__())
+        args = ''
+        if self.parents:
+            for pp in self.parents:
+                args += str(pp.value) + ' '
+        else:
+            args = 'None'
+        #print('Numtor \'{}\' created via op <{}>. Value: {}. Parents: {}'.format(self.name, self.op, self.value, args))
  
                 
     def __add__(self, other):
@@ -36,7 +36,10 @@ class Numtor:
         # parent_ops = []
         # if self.parents is not None:
         #     parent_ops=[parent.op for parent in self.parents]
-        self.grad += delta
+        if self.parents is None:
+            self.grad += delta
+        else:
+            self.grad = delta
   #      print('Backprop:', self.name, self.op, delta, self.grad, parent_ops)
         if self.parents is not None:
             grad_ops[self.op](self, self.parents)

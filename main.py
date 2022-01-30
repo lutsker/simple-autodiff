@@ -9,7 +9,7 @@ if __name__ == '__main__':
     alpha = -1.45
     beta = 2.2
     xx = np.arange(N) / float(N) * D
-    yy = alpha * xx + beta + np.random.normal(loc=0, scale=0.5, size=N)
+    yy = alpha * xx + beta + np.random.normal(loc=0, scale=0.25, size=N)
 
     # Model
     eta = 0.00003
