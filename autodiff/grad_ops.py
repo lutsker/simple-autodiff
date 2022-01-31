@@ -22,11 +22,9 @@ def sub_grad(self, parents):
     parents[0].backward(self.grad)
     parents[1].backward(-self.grad)
 
-def assign_grad(self, parents):
-    pass
 
 grad_ops = {'exp': exp_grad, 'log': log_grad, 'add': add_grad, 'mul': mul_grad, 'sigmoid': sigmoid_grad,
-'sub': sub_grad, 'assign': assign_grad}
+'sub': sub_grad}
 
 
 def np_sigmoid_grad(parent, this):

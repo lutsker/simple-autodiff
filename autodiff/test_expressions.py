@@ -8,7 +8,7 @@ def test_exp():
     a = Numtor(8)
     y = np_exp(a*x)
     y.backward()
-    assert x.grad == y.value * a.value
+    assert x.grad == pytest.approx(y.value * a.value)
 
 def test_complex_log():
     x = Numtor(25)
@@ -79,7 +79,6 @@ def test_square_loss():
     w1 = a - z1
     l = w1 * w1  
     l.backward()
-    print(x1.grad, y1.grad)
     assert x1.grad == pytest.approx(2*(a.value - x2.value - x1.value * b.value) * (-b.value) )
     assert x2.grad == pytest.approx(-2*(a.value - x2.value - x1.value * b.value) )
 
@@ -91,8 +90,8 @@ def test_square():
     b = (a+y)*(a+y)
     b.backward()
     print(x.grad, 2 * 5 * 2)
-    assert x.grad == 20
-    assert c.grad == 20
+    assert x.grad == pytest.approx(20)
+    assert c.grad == pytest.approx(20)
 
 def test_chained():
     x1 = Numtor(1)
@@ -104,16 +103,19 @@ def test_chained():
     y = w3 * z
     y.backward()
     # dy/dw2 = w3 z(1-z)x1
-    assert w3.grad == z.value
-    assert w1.grad == w3.value * z.value * (1-z.value) * x1.value
-    assert w2.grad == w3.value * z.value * (1-z.value) * x2.value
+    assert pytest.approx(w3.grad) == z.value
+    assert pytest.approx(w1.grad) == w3.value * z.value * (1-z.value) * x1.value
+    assert pytest.approx(w2.grad) == w3.value * z.value * (1-z.value) * x2.value
 
-def test_chained_shared_weight():
-    x1 = Numtor(1)
-    x2 = Numtor(2)
-    w  = Numtor(2)
+@pytest.mark.parametrize('x1val', [ -2.9, 0, 7.5])
+@pytest.mark.parametrize('x2val', [ -3.4, 0, 1.1])
+@pytest.mark.parametrize('wval', [ -1.2, 0, 5.6])
+def test_chained_shared_weight(x1val, x2val, wval):
+    x1 = Numtor(x1val)
+    x2 = Numtor(x2val)
+    w  = Numtor(wval)
     z = np_sigmoid( x1 * w + x2 * w )
     y = w * z
     y.backward()
     # dy/dw = z + w z(1-z)(x1 + x2)
-    assert w.grad == z.value + w.value * z.value * (1-z.value) * (x1.value + x2.value)
+    assert pytest.approx(w.grad) == z.value + w.value * z.value * (1-z.value) * (x1.value + x2.value)
